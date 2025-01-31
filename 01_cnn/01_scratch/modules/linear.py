@@ -61,6 +61,11 @@ class Linear:
         #    1) You may want to flatten the input first                             #
         #############################################################################
 
+        N = x.shape[0]
+        x_flat = x.reshape(N, -1)
+        out = np.dot(x_flat, self.weight) + self.bias
+        self.cache = x
+        return out
 
         #############################################################################
         #                              END OF YOUR CODE                             #
@@ -85,6 +90,12 @@ class Linear:
         #    1) Implement the linear backward pass.                                 #
         #############################################################################
 
+        N = x.shape[0]
+        x_flat = x.reshape(N, -1)
+
+        self.dw = np.dot(x_flat.T, dout)
+        self.db = np.sum(dout, axis=0)
+        self.dx = np.dot(dout, self.weight.T).reshape(x.shape)
 
         #############################################################################
         #                              END OF YOUR CODE                             #

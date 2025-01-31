@@ -50,7 +50,24 @@ class MaxPooling:
         #    1) You may implement the process with loops                            #
         #############################################################################
 
-        
+        N, C, H, W = x.shape
+        HH, WW = self.kernel_size, self.kernel_size
+        stride = self.stride
+        H_out = (H - HH) // stride + 1
+        W_out = (W - WW) // stride + 1
+
+        out = np.zeros((N, C, H_out, W_out))
+
+        for n in range(N):
+            for c in range(C):
+                for i in range(H_out):
+                    for j in range(W_out):
+                        h_start, w_start = i * stride, j * stride
+                        h_end, w_end = h_start + HH, w_start + WW
+                        out[n, c, i, j] = np.max(x[n, c, h_start:h_end, w_start:w_end])
+
+        H_out, W_out = out.shape[2], out.shape[3]
+
         #############################################################################
         #                              END OF YOUR CODE                             #
         #############################################################################
@@ -75,6 +92,24 @@ class MaxPooling:
         #    2) You may find np.unravel_index useful                                #
         #############################################################################
 
+        N, C, H, W = x.shape
+        HH, WW = self.kernel_size, self.kernel_size
+        stride = self.stride
+        H_out, W_out = dout.shape[2]. dout.shape[3]
+
+        self.dx = np.zeros_like(x)
+
+        for n in range(N):
+            for c in range(C):
+                for i in range(H_out):
+                    for j in range(W_out):
+                        h_start, w_start = i * stride, j * stride
+                        h_end, w_end = h_start + HH, w_start + WW
+                        x_slice = x[n, c, h_start:h_end, w_start:w_end]
+                        max_idx = np.unravel_index(np.argmax(x_slice), x_slice.shape)
+                        self.dx[n, c, h_start + max_idx[0], w_start + max_idx[1]] += dout[n, c, i, j]
+
+        return self.dx
         
         #############################################################################
         #                              END OF YOUR CODE                             #

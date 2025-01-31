@@ -78,6 +78,11 @@ class ConvNet:
         #    1) Implement forward pass of the model                                 #
         #############################################################################
 
+        for modules in self.modules:
+            x = modules.forward(x)
+
+        probs = x #set final output after the last layer
+        loss = self.criterion.forward(probs, y)
         
         #############################################################################
         #                              END OF YOUR CODE                             #
@@ -96,7 +101,11 @@ class ConvNet:
         #    1) Implement backward pass of the model                                #
         #############################################################################
 
-        
+        dx = self.criterion.backward() # compute initial gradient
+
+        for modules in reversed(self.modules):
+            dx = modules.backward(dx) # back-propagate through all layers in reverse
+
         #############################################################################
         #                              END OF YOUR CODE                             #
         #############################################################################
