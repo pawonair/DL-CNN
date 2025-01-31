@@ -1,0 +1,34 @@
+# Otto-Friedrich University of Bamberg
+# Chair of Explainable Machine Learning (xAI)
+# Deep Learning Assignments
+#
+# @description:
+# Contains all the required packages for the current assignment.
+#
+# @author: Sebastian Doerrich
+# @copyright: Copyright (c) 2022, Chair of Explainable Machine Learning (xAI), Otto-Friedrich University of Bamberg
+# @credits: [Christian Ledig, Sebastian Doerrich]
+# @license: CC BY-SA
+# @version: 1.0
+# @python: Python 3
+# @maintainer: Sebastian Doerrich
+# @email: sebastian.doerrich@uni-bamberg.de
+# @status: Production
+
+name: xai-dl-a4
+channels:
+  - defaults
+  - conda-forge
+  - anaconda
+dependencies:
+  - python=3.9
+  - jupyter
+  - numpy
+  - future
+  - scipy
+  - matplotlib
+  - pyyaml=5.4.1
+  - pip
+  - pip:
+    - nbimporter
+    - pillow
