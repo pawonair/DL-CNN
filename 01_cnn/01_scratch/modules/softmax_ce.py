@@ -58,3 +58,4 @@ class SoftmaxCrossEntropy:
         dx /= N
 
         self.dx = dx
+        return dx

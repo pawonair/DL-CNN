@@ -79,11 +79,11 @@ class ConvNet:
         #############################################################################
 
         # Forward pass through all modules
-        for modules in self.modules:
-            x = modules.forward(x)
+        for module in self.modules:
+            x = module.forward(x)
 
         probs = x  # Set final output after the last layer
-        loss = self.criterion.forward(probs, y)
+        _, loss = self.criterion.forward(probs, y)
 
         #############################################################################
         #                              END OF YOUR CODE                             #
@@ -103,8 +103,8 @@ class ConvNet:
         #############################################################################
 
         dx = self.criterion.backward()  # Compute initial gradient
-        for modules in reversed(self.modules):
-            dx = modules.backward(dx)  # Back-propagate through all layers in reverse
+        for module in reversed(self.modules):
+            dx = module.backward(dx)  # Back-propagate through all layers in reverse
 
         #############################################################################
         #                              END OF YOUR CODE                             #

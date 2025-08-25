@@ -170,6 +170,9 @@ class Conv2D:
         else:
             self.dx = dx_padded[:, :, pad:-pad, pad:-pad]
 
+        self.dweight = self.dw
+        self.dbias = self.db
+        return self.dx
         #############################################################################
         #                              END OF YOUR CODE                             #
         #############################################################################
