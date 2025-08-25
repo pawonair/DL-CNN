@@ -79,7 +79,7 @@ class ClassifierTrainer(object):
                 y_batch = y
 
             # evaluate cost and gradient
-            out, cost = model.forward(X_batch, y_batch)
+            _, cost = model.forward(X_batch, y_batch)
             model.backward()
             optimizer.update(model)
 
@@ -103,10 +103,10 @@ class ClassifierTrainer(object):
                     X_train_subset = X
                     y_train_subset = y
 
-                    scores_train, _ = model.forward(X_train_subset, y_train_subset)
-                    y_pred_train = np.argmax(scores_train, axis=1)
-                    train_acc = np.mean(y_pred_train == y_train_subset)
-                    train_acc_history.append(train_acc)
+                scores_train, _ = model.forward(X_train_subset, y_train_subset)
+                y_pred_train = np.argmax(scores_train, axis=1)
+                train_acc = np.mean(y_pred_train == y_train_subset)
+                train_acc_history.append(train_acc)
 
                 # print progress if needed
                 if verbose:
