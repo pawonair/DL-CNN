@@ -95,7 +95,7 @@ class MaxPooling:
         N, C, H, W = x.shape
         HH, WW = self.kernel_size, self.kernel_size
         stride = self.stride
-        H_out, W_out = dout.shape[2]. dout.shape[3]
+        H_out, W_out = dout.shape[2], dout.shape[3]
 
         self.dx = np.zeros_like(x)
 

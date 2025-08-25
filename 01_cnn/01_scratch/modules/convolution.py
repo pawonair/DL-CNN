@@ -73,20 +73,35 @@ class Conv2D:
         #############################################################################
 
         N, C, H, W = x.shape
+        F = self.out_channels
+        HH = WW = self.kernel_size
         pad = self.padding
         stride = self.stride
-        F, _, HH, WW = self.weight.shape
-        H_Out = (H + 2 * pad - HH) // stride + 1
-        W_Out = (W + 2 * pad - WW) // stride + 1
 
-        x_padded = np.pad(x, ((0, 0), (0, 0), (pad, pad)), mode='constant', constant_values=0)
+        # Calculate output dimensions
+        H_Out = 1 + (H + 2 * pad - HH) // stride
+        W_Out = 1 + (W + 2 * pad - WW) // stride
+
+        # Initialize ouput
         out = np.zeros((N, F, H_Out, W_Out))
 
-        for i in range(H_Out):
-            for j in range(W_Out):
-                x_slice = x_padded[:, :, i * stride:i * stride + HH, j * stride:j * stride + WW]
-                for f in range(F):
-                    out[:, f, i, j] = np.sum(x_slice * self.weight[f], axis=(1, 2, 3)) + self.bias[f]
+        x_padded = np.pad(x, ((0, 0), (0, 0), (pad, pad), (pad, pad)), mode='constant', constant_values=0)
+
+        for n in range(N):
+            for f in range(F):
+                for i in range(H_Out):
+                    for j in range(W_Out):
+                        h_start = i * stride
+                        h_end = h_start + HH
+                        w_start = j * stride
+                        w_end = w_start + WW
+
+                        # Get input slice
+                        input_slice = x_padded[n, :, h_start:h_end, w_start:w_end]
+
+                        # Compute convolution for this position
+                        out[n, f, i, j] = np.sum(input_slice * self.weight[f]) + self.bias[f]
+
 
         #############################################################################
         #                              END OF YOUR CODE                             #
@@ -116,29 +131,44 @@ class Conv2D:
 
         N, C, H, W = x.shape
         F, _, HH, WW = self.weight.shape
+        H_Out, W_Out = dout.shape[2], dout.shape[3]
         pad = self.padding
         stride = self.stride
-        H_Out, W_Out = dout.shape[2], dout.shape[3]
 
-        x_padded = np.pad(x, ((0, 0), (0, 0), (pad, pad)), mode='constant', constant_values=0)
-        dx_padded = np.zeros_like(x_padded)
+        # Initialize gradients
+        self.dx = np.zeros_like(x)
         self.dw = np.zeros_like(self.weight)
         self.db = np.zeros_like(self.bias)
 
-        for i in range(H_Out):
-            for j in range(W_Out):
-                x_slice = x_padded[:, :, i * stride:i * stride + HH, j * stride:j * stride + WW]
-                for f in range(F):
-                    self.dw[f] += np.sum(x_slice * dout[:, f, i, j][:, None, None, None], axis=0)
-                for n in range(N):
-                    dx_padded[n, :, i * stride:i * stride + HH, j * stride:j * stride + WW] += np.sum(self.weight * dout[n, :, i, j][:, None, None, None], axis=0)
+        x_padded = np.pad(x, ((0, 0), (0, 0), (pad, pad), (pad, pad)), mode='constant', constant_values=0)
+        dx_padded = np.zeros_like(x_padded)
 
-        self.db = np.sum(dout, axis=(0, 2, 3))
+        for n in range(N):
+            for f in range(F):
+                for i in range(H_Out):
+                    for j in range(W_Out):
+                        h_start = i * stride
+                        h_end = h_start + HH
+                        w_start = j * stride
+                        w_end = w_start + WW
 
-        if pad > 0:
-            self.dx = dx_padded[:, :, pad:-pad, pad:-pad]
-        else:
+                        # Get input slice
+                        x_slice = x_padded[n, :, h_start:h_end, w_start:w_end]
+
+                        # Calculate gradient of weight
+                        self.dw[f] += x_slice * dout[n, f, i, j]
+
+                        # Calculate gradient of bias
+                        self.db[f] += dout[n, f, i, j]
+
+                        # Calculate gradient of input
+                        dx_padded[n, :, h_start:h_end, w_start:w_end] += self.weight[f] * dout[n, f, i, j]
+
+        # Remove padding from dx_padded to get dx
+        if pad == 0:
             self.dx = dx_padded
+        else:
+            self.dx = dx_padded[:, :, pad:-pad, pad:-pad]
 
         #############################################################################
         #                              END OF YOUR CODE                             #
