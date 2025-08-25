@@ -49,6 +49,10 @@ class SGD(_BaseOptimizer):
                 #    1) Momentum updates for weights                                        #
                 #############################################################################
 
+                vt = self.velocities[idx]['vt_weight']
+                vt = self.momentum * vt - self.learning_rate * m.dweight
+                self.velocities[idx]['vt_weight'] = vt
+                m.weight += vt
                 
                 #############################################################################
                 #                              END OF YOUR CODE                             #
@@ -60,6 +64,10 @@ class SGD(_BaseOptimizer):
                 #    1) Momentum updates for bias                                           #
                 #############################################################################
 
+                vt = self.velocities[idx]['vt_bias']
+                vt = self.momentum * vt - self.learning_rate * m.dbias
+                self.velocities[idx]['vt_bias'] = vt
+                m.bias += vt
                 
                 #############################################################################
                 #                              END OF YOUR CODE                             #
